@@ -1,0 +1,51 @@
+.attendance-card{
+
+    background:#fff;
+
+    border-radius:20px;
+
+    padding:24px;
+
+    box-shadow:0 8px 24px rgba(15,23,42,.06);
+
+    border:1px solid #eef2f7;
+
+    height:100%;
+
+}
+
+.attendance-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.attendance-header h4{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:#0F172A;
+
+}
+
+.attendance-header span{
+
+    color:#64748B;
+
+    font-size:14px;
+
+}
+
+.attendance-chart{
+
+    height:280px;
+
+} 

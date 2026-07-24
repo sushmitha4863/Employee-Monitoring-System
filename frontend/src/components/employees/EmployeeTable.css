@@ -1,0 +1,169 @@
+.employee-table-card{
+
+    background:#fff;
+
+    border-radius:22px;
+
+    padding:25px;
+
+    border:1px solid #EEF2F7;
+
+    box-shadow:0 10px 25px rgba(15,23,42,.06);
+
+    overflow-x:auto;
+
+}
+
+.employee-table-card table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.employee-table-card th{
+
+    text-align:left;
+
+    padding:18px;
+
+    color:#64748B;
+
+    font-size:15px;
+
+    border-bottom:1px solid #EEF2F7;
+
+}
+
+.employee-table-card td{
+
+    padding:20px 18px;
+
+    border-bottom:1px solid #F1F5F9;
+
+}
+
+.employee-info{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+.employee-avatar{
+
+    width:50px;
+
+    height:50px;
+
+    border-radius:50%;
+
+    background:#F79A1E;
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:20px;
+
+    font-weight:700;
+
+}
+
+.employee-info h6{
+
+    margin:0;
+
+    font-size:17px;
+
+    font-weight:600;
+
+    color:#0F172A;
+
+}
+
+.employee-info span{
+
+    color:#64748B;
+
+    font-size:14px;
+
+}
+
+.badge-active{
+
+    background:#DCFCE7;
+
+    color:#16A34A;
+
+    padding:8px 16px;
+
+    border-radius:30px;
+
+    font-weight:600;
+
+}
+
+.badge-inactive{
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+    padding:8px 16px;
+
+    border-radius:30px;
+
+    font-weight:600;
+
+}
+
+.table-actions{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.table-actions button{
+
+    width:40px;
+
+    height:40px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#F8FAFC;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    font-size:18px;
+
+}
+
+.table-actions button:hover{
+
+    background:#F79A1E;
+
+    color:white;
+
+}
+
+.delete-btn:hover{
+
+    background:#EF4444 !important;
+
+}

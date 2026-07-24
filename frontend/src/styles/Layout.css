@@ -1,0 +1,362 @@
+/* ==========================================
+   GLOBAL LAYOUT
+========================================== */
+
+.layout{
+    display:flex;
+    min-height:100vh;
+    background:#F5F7FA;
+}
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+.sidebar{
+
+    width:260px;
+
+    background:#FFFFFF;
+
+    border-right:1px solid #E5E7EB;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    padding:25px 20px;
+
+    position:fixed;
+
+    left:0;
+    top:0;
+
+    height:100vh;
+
+}
+
+/* ==========================================
+   LOGO
+========================================== */
+
+.sidebar-logo{
+
+    margin-bottom:40px;
+
+    text-align:center;
+
+}
+
+.sidebar-logo h2{
+
+    color:#F79A1E;
+
+    font-size:34px;
+
+    font-weight:700;
+
+    margin-bottom:5px;
+
+}
+
+.sidebar-logo span{
+
+    color:#64748B;
+
+    font-size:14px;
+
+}
+
+/* ==========================================
+   MENU
+========================================== */
+
+.sidebar-menu{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.sidebar-menu a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:14px 18px;
+
+    border-radius:12px;
+
+    color:#475569;
+
+    text-decoration:none;
+
+    font-size:15px;
+
+    font-weight:500;
+
+    transition:.3s;
+
+}
+
+.sidebar-menu a svg{
+
+    font-size:22px;
+
+}
+
+.sidebar-menu a:hover{
+
+    background:#FFF4E8;
+
+    color:#F79A1E;
+
+}
+
+.sidebar-menu .active{
+
+    background:#F79A1E;
+
+    color:white;
+
+}
+
+/* ==========================================
+   LOGOUT
+========================================== */
+
+.logout-btn{
+
+    width:100%;
+
+    border:none;
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+    padding:14px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.logout-btn:hover{
+
+    background:#DC2626;
+
+    color:white;
+
+}
+
+/* ==========================================
+   MAIN SECTION
+========================================== */
+
+.main-section{
+
+    margin-left:260px;
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.dashboard-header{
+
+    height:80px;
+
+    background:white;
+
+    border-bottom:1px solid #E5E7EB;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 35px;
+
+}
+
+.dashboard-header h3{
+
+    font-size:24px;
+
+    color:#1F2937;
+
+    margin-bottom:4px;
+
+}
+
+.dashboard-header p{
+
+    color:#64748B;
+
+    font-size:14px;
+
+}
+
+/* ==========================================
+   PROFILE
+========================================== */
+
+.header-profile{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+}
+
+.profile-avatar{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:50%;
+
+    background:#F79A1E;
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-weight:700;
+
+    font-size:20px;
+
+}
+
+.header-profile h5{
+
+    margin:0;
+
+    font-size:16px;
+
+    color:#1F2937;
+
+}
+
+.header-profile span{
+
+    color:#64748B;
+
+    font-size:13px;
+
+}
+
+/* ==========================================
+   PAGE CONTENT
+========================================== */
+
+.page-content{
+
+    padding:35px;
+
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:992px){
+
+    .sidebar{
+
+        width:80px;
+
+    }
+
+    .sidebar-logo span{
+
+        display:none;
+
+    }
+
+    .sidebar-menu a span{
+
+        display:none;
+
+    }
+
+    .logout-btn span{
+
+        display:none;
+
+    }
+
+    .main-section{
+
+        margin-left:80px;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .sidebar{
+
+        display:none;
+
+    }
+
+    .main-section{
+
+        margin-left:0;
+
+    }
+
+    .dashboard-header{
+
+        padding:20px;
+
+    }
+
+    .page-content{
+
+        padding:20px;
+
+    }
+
+}

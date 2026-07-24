@@ -1,0 +1,2 @@
+namespace EmployeeMonitoringAPI.Interfaces;
+public interface IAuditService { Task RecordAsync(string action, string entityType, string? entityId = null, string result = "Success", object? safeMetadata = null, int? actorUserId = null, CancellationToken cancellationToken = default); }

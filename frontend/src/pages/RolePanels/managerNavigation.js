@@ -1,0 +1,3 @@
+export const managerMenu=[
+ {label:"Dashboard",path:"/dashboard",icon:"dashboard"},{label:"My Team",path:"/team",icon:"team"},{label:"Projects & Tasks",path:"/projects",icon:"projects"},{label:"Team Attendance",path:"/attendance",icon:"attendance"},{label:"Leave Requests",path:"/leaves",icon:"leaves"},{label:"Timesheets",path:"/timesheets",icon:"tasks"},{label:"Performance",path:"/performance",icon:"performance"},{label:"Calendar",path:"/calendar",icon:"calendar"},{label:"Reports",path:"/reports",icon:"reports"},{label:"Settings",path:"/settings",icon:"settings"}
+];

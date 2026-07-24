@@ -1,0 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+namespace EmployeeMonitoringAPI.DTOs;
+public sealed class MfaVerifyRequest { [Required] public string ChallengeId { get; set; } = string.Empty; [Required, RegularExpression("^[0-9]{6,8}$")] public string Otp { get; set; } = string.Empty; }
+public sealed class MfaResendRequest { [Required] public string ChallengeId { get; set; } = string.Empty; }
+public sealed class DepartmentRequest { [Required, MaxLength(120)] public string Name { get; set; } = string.Empty; [Required, MaxLength(30)] public string DepartmentCode { get; set; } = string.Empty; [MaxLength(500)] public string? Description { get; set; } }
+public sealed class HolidayRequest { [Required, MaxLength(150)] public string HolidayName { get; set; } = string.Empty; public DateTime HolidayDate { get; set; } [MaxLength(500)] public string? Description { get; set; } }
+public sealed class StatusRequest { public bool IsActive { get; set; } }
+public sealed class CalendarStatusRequest { [Required] public string Status { get; set; } = string.Empty; }
+public sealed class AdminReportQuery { public int? Year { get; set; } public string? Quarter { get; set; } public DateTime? From { get; set; } public DateTime? To { get; set; } public int? DepartmentId { get; set; } public int? ManagerId { get; set; } public string? Status { get; set; } public bool IncludeArchived { get; set; } }
+public sealed class AdminReportSummaryDto { public int ProjectsCreated { get; set; } public int ProjectsStarted { get; set; } public int ProjectsCompleted { get; set; } public int ProjectsOngoing { get; set; } public int ProjectsDelayed { get; set; } public int ProjectsArchived { get; set; } public decimal CompletionRate { get; set; } public decimal AverageProgress { get; set; } public int ManagerAssignments { get; set; } public int DepartmentCount { get; set; } }
+public sealed class PageResult<T> { public IReadOnlyList<T> Items { get; init; } = Array.Empty<T>(); public int Page { get; init; } public int PageSize { get; init; } public int TotalCount { get; init; } }

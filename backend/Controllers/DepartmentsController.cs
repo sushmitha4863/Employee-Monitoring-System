@@ -1,0 +1,41 @@
+using EmployeeMonitoringAPI.Data;
+using EmployeeMonitoringAPI.DTOs;
+using EmployeeMonitoringAPI.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+namespace EmployeeMonitoringAPI.Controllers;
+[Route("api/[controller]")][ApiController][Authorize]
+public sealed class DepartmentsController : ControllerBase
+{
+    private readonly ApplicationDbContext _db; private readonly IAuditService _audit;
+    public DepartmentsController(ApplicationDbContext db,IAuditService audit){_db=db;_audit=audit;}
+    [HttpGet]
+    public async Task<IActionResult> List(string? search,bool? isActive)
+    {
+        var q=_db.Departments.AsNoTracking().AsQueryable(); if(isActive.HasValue)q=q.Where(x=>x.IsActive==isActive);if(!string.IsNullOrWhiteSpace(search))q=q.Where(x=>x.Name.Contains(search)||x.DepartmentCode.Contains(search));
+        return Ok(await q.OrderBy(x=>x.Name).Select(x=>new{departmentId=x.Id,id=x.Id,departmentName=x.Name,name=x.Name,x.DepartmentCode,x.Description,x.IsActive,x.CreatedAt,x.UpdatedAt,employeeCount=_db.Users.Count(u=>u.DepartmentId==x.Id&&u.Role=="Employee"),activeProjectCount=_db.Projects.Count(p=>p.DepartmentId==x.Id&&!p.IsArchived),managerId=_db.Users.Where(u=>u.DepartmentId==x.Id&&u.Role=="Manager"&&u.IsActive).Select(u=>(int?)u.UserId).FirstOrDefault(),departmentHead=_db.Users.Where(u=>u.DepartmentId==x.Id&&u.Role=="Manager"&&u.IsActive).Select(u=>u.FullName).FirstOrDefault()}).ToListAsync());
+    }
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> Get(int id){var x=await _db.Departments.AsNoTracking().FirstOrDefaultAsync(d=>d.Id==id);return x is null?NotFound(new{message="Department not found"}):Ok(x);}
+    [HttpPost][Authorize(Roles="Admin")]
+    public async Task<IActionResult> Create(DepartmentRequest dto){var name=dto.Name.Trim();var code=dto.DepartmentCode.Trim().ToUpperInvariant();if(await _db.Departments.AnyAsync(x=>x.Name==name||x.DepartmentCode==code))return Conflict(new{message="Department name or code already exists"});var item=new Department{Name=name,DepartmentCode=code,Description=dto.Description?.Trim(),IsActive=true,CreatedAt=DateTime.UtcNow,UpdatedAt=DateTime.UtcNow};_db.Departments.Add(item);await _db.SaveChangesAsync();await _audit.RecordAsync("DepartmentCreated","Department",item.Id.ToString(),safeMetadata:new{item.Name,item.DepartmentCode});return Ok(new{message="Department created",departmentId=item.Id});}
+    [HttpPut("{id:int}")][Authorize(Roles="Admin")]
+    public async Task<IActionResult> Update(int id,DepartmentRequest dto){var item=await _db.Departments.FindAsync(id);if(item is null)return NotFound(new{message="Department not found"});var name=dto.Name.Trim();var code=dto.DepartmentCode.Trim().ToUpperInvariant();if(await _db.Departments.AnyAsync(x=>x.Id!=id&&(x.Name==name||x.DepartmentCode==code)))return Conflict(new{message="Department name or code already exists"});item.Name=name;item.DepartmentCode=code;item.Description=dto.Description?.Trim();item.UpdatedAt=DateTime.UtcNow;await _db.SaveChangesAsync();await _audit.RecordAsync("DepartmentUpdated","Department",id.ToString(),safeMetadata:new{item.Name,item.DepartmentCode});return Ok(new{message="Department updated"});}
+    [HttpPatch("{id:int}/status")][Authorize(Roles="Admin")]
+    public async Task<IActionResult> Status(int id,[FromBody]bool isActive){var item=await _db.Departments.FindAsync(id);if(item is null)return NotFound(new{message="Department not found"});item.IsActive=isActive;item.UpdatedAt=DateTime.UtcNow;await _db.SaveChangesAsync();await _audit.RecordAsync(isActive?"DepartmentActivated":"DepartmentDeactivated","Department",id.ToString());return Ok(new{message=isActive?"Department activated":"Department deactivated",departmentId=id,isActive});}
+    [HttpGet("eligible-managers")][Authorize(Roles="Admin")]
+    public async Task<IActionResult> EligibleManagers()=>Ok(await _db.Users.AsNoTracking().Where(x=>x.Role=="Manager"&&x.IsActive).OrderBy(x=>x.FullName).Select(x=>new{x.UserId,x.FullName,x.EmployeeCode,x.Email,x.DepartmentId,x.IsActive}).ToListAsync());
+    [HttpGet("eligible-employees")][Authorize(Roles="Admin")]
+    public async Task<IActionResult> EligibleEmployees()=>Ok(await _db.Users.AsNoTracking().Where(x=>x.Role=="Employee"&&x.IsActive).OrderBy(x=>x.FullName).Select(x=>new{x.UserId,x.FullName,x.EmployeeCode,x.Email,x.DepartmentId,CurrentDepartment=x.Department!=null?x.Department.Name:null,x.IsActive}).ToListAsync());
+    [HttpGet("{id:int}/members")][Authorize(Roles="Admin")]
+    public async Task<IActionResult> Members(int id){if(!await _db.Departments.AnyAsync(x=>x.Id==id))return NotFound(new{message="Department not found"});return Ok(await _db.Users.AsNoTracking().Where(x=>x.DepartmentId==id).OrderBy(x=>x.Role).ThenBy(x=>x.FullName).Select(x=>new{x.UserId,x.FullName,x.EmployeeCode,x.Email,x.Role,x.Designation,x.IsActive}).ToListAsync());}
+    [HttpPut("{id:int}/manager/{managerId:int}")][Authorize(Roles="Admin")]
+    public async Task<IActionResult> AssignManager(int id,int managerId){await using var tx=await _db.Database.BeginTransactionAsync();var department=await _db.Departments.FindAsync(id);if(department is null)return NotFound(new{message="Department not found"});if(!department.IsActive)return Conflict(new{message="Inactive departments cannot receive assignments"});var manager=await _db.Users.FirstOrDefaultAsync(x=>x.UserId==managerId&&x.Role=="Manager"&&x.IsActive);if(manager is null)return BadRequest(new{message="Only an active Manager can be assigned"});var current=await _db.Users.Where(x=>x.DepartmentId==id&&x.Role=="Manager"&&x.UserId!=managerId).ToListAsync();foreach(var old in current)old.DepartmentId=null;var previous=manager.DepartmentId;manager.DepartmentId=id;await _db.SaveChangesAsync();await tx.CommitAsync();await _audit.RecordAsync("DepartmentManagerAssigned","Department",id.ToString(),safeMetadata:new{managerId,previousDepartmentId=previous});return Ok(new{message="Manager assigned",departmentId=id,managerId});}
+    [HttpDelete("{id:int}/manager")][Authorize(Roles="Admin")]
+    public async Task<IActionResult> RemoveManager(int id){var manager=await _db.Users.FirstOrDefaultAsync(x=>x.DepartmentId==id&&x.Role=="Manager");if(manager is null)return NotFound(new{message="No manager is assigned"});manager.DepartmentId=null;await _db.SaveChangesAsync();await _audit.RecordAsync("DepartmentManagerRemoved","Department",id.ToString(),safeMetadata:new{managerId=manager.UserId});return Ok(new{message="Manager removed"});}
+    [HttpPost("{id:int}/employees/{employeeId:int}")][Authorize(Roles="Admin")]
+    public async Task<IActionResult> AssignEmployee(int id,int employeeId){await using var tx=await _db.Database.BeginTransactionAsync();var department=await _db.Departments.FindAsync(id);if(department is null)return NotFound(new{message="Department not found"});if(!department.IsActive)return Conflict(new{message="Inactive departments cannot receive assignments"});var employee=await _db.Users.FirstOrDefaultAsync(x=>x.UserId==employeeId&&x.Role=="Employee"&&x.IsActive);if(employee is null)return BadRequest(new{message="Only an active Employee can be assigned"});if(employee.DepartmentId==id)return Conflict(new{message="Employee is already assigned to this department"});var previous=employee.DepartmentId;employee.DepartmentId=id;await _db.SaveChangesAsync();await tx.CommitAsync();await _audit.RecordAsync("EmployeeDepartmentAssigned","Department",id.ToString(),safeMetadata:new{employeeId,previousDepartmentId=previous});return Ok(new{message="Employee assigned",employeeId,departmentId=id});}
+    [HttpDelete("{id:int}/employees/{employeeId:int}")][Authorize(Roles="Admin")]
+    public async Task<IActionResult> RemoveEmployee(int id,int employeeId){var employee=await _db.Users.FirstOrDefaultAsync(x=>x.UserId==employeeId&&x.DepartmentId==id&&x.Role=="Employee");if(employee is null)return NotFound(new{message="Employee is not assigned to this department"});employee.DepartmentId=null;await _db.SaveChangesAsync();await _audit.RecordAsync("EmployeeDepartmentRemoved","Department",id.ToString(),safeMetadata:new{employeeId});return Ok(new{message="Employee removed"});}
+}
